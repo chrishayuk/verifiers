@@ -6,7 +6,7 @@ class TankaVerifier(BaseVerifier):
     def __init__(self):
         super().__init__(
             name="tanka_verifier",
-            description="Checks if text is a tanka with 5 lines ~5-7-5-7-7 syllables (partial credit).",
+            description="Checks if text is a tanka with 5 lines ~5-7-5-7-7 syllables.",
             parameters={
                 "tolerance": {
                     "type": "integer",
