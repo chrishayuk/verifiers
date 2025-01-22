@@ -1,0 +1,11 @@
+[project]
+name = "verifiers"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pronouncing>=0.2.0",
+    "pytest>=8.3.4",
+    "setuptools>=75.8.0",
+]
