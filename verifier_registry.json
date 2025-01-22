@@ -55,5 +55,18 @@
           "help": "Score assigned if last letters match but phoneme overlap fails."
         }
       ]
-    }
+    },
+    "tanka": {
+    "module": "verifiers.poetry.tanka_verifier",
+    "class": "TankaVerifier",
+    "description": "Checks if text is a 5-line tanka with ~5-7-5-7-7 syllables",
+    "arguments": [
+      {
+        "name": "--tolerance",
+        "type": "int",
+        "default": 1,
+        "help": "Allowed ± deviation from each line's syllable target"
+      }
+    ]
+  }
   }

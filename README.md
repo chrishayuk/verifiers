@@ -1,8 +1,13 @@
 
-# For haiku, the registry says there's one argument: --tolerance
-uv run cli.py samples/poetry/haikus/my_haiku.txt --verifier=haiku --feedback
-uv run cli.py samples/my_haiku_invalid.txt --verifier=haiku --feedback
+# haiku
+uv run cli.py samples/poetry/haikus/good_haiku.txt --verifier=haiku --feedback
+uv run cli.py samples/poetry/haikusinvalid_haiku_.txt --verifier=haiku --feedback
 
-# For limerick, the registry says arguments: --line_count_required, --long_min, ...
-uv run cli.py samples/poetry/limericks/my_limerick.txt --verifier=limerick --feedback
-uv run cli.py samples/poetry/limericks/my_limerick_invalid.txt --verifier=limerick --feedback
+# limerick
+uv run cli.py samples/poetry/limericks/good_limerick.txt --verifier=limerick --feedback
+uv run cli.py samples/poetry/limericks/invalid_limerick.txt --verifier=limerick --feedback
+
+# tanka
+uv run cli.py samples/poetry/tankas/good_tanka.txt --verifier=tanka --feedback
+uv run cli.py samples/poetry/tankas/invalid_tanka.txt --verifier=tanka --feedback
+
