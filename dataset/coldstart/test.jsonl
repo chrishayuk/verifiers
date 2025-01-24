@@ -1,0 +1,3 @@
+{"messages":[{"role":"user","content":"Translate this sentence into French: 'I enjoy learning new skills.'"},{"role":"assistant","content":"J’aime apprendre de nouvelles compétences."}]}
+{"messages":[{"role":"user","content":"Give me a random historical fact."},{"role":"assistant","content":"The Great Wall of China isn’t a single continuous wall, but a series of fortifications built over centuries."}]}
+{"messages":[{"role":"user","content":"Tell me a joke about cats."},{"role":"assistant","content":"Sure. Why did the cat join the Red Cross? Because it wanted to be a first-aid kit-ten!"}]}
