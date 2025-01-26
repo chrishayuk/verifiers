@@ -14,6 +14,13 @@ uv run -m mlx_lm.generate \
   --prompt '{"role":"user","content":"Hello, how are you?"}'
 
 
+uv run -m mlx_lm.chat \
+  --model "Qwen/Qwen2.5-3B" \
+  --max-tokens 500 \
+  --adapter-path adapters
+
+
+
   <|endoftext|>
 
 
