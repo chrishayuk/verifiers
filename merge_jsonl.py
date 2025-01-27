@@ -2,7 +2,7 @@ import sys
 import json
 import random
 
-def merge_and_randomize_jsonl_files(output_file="coldstart/merged.jsonl"):
+def merge_and_randomize_jsonl_files(output_file="coldstart/merged_completions.jsonl"):
     # Grab filenames from command-line args (excluding the script name)
     filenames = sys.argv[1:]
     
