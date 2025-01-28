@@ -6,8 +6,12 @@ uv run cli.py samples/poetry/haikus/granite_haiku.txt --verifier=haiku --feedbac
 uv run cli.py samples/poetry/haikus/phi4_haiku_.txt --verifier=haiku --feedback
 
 # limerick
-uv run cli.py samples/poetry/limericks/good_limerick.txt --verifier=limerick --feedback
+uv run cli.py samples/poetry/limericks/valid_limerick.txt --verifier=limerick --feedback
 uv run cli.py samples/poetry/limericks/invalid_limerick.txt --verifier=limerick --feedback
+
+# rhyme
+uv run cli.py samples/poetry/rhymes/valid_rhyme.txt --verifier=rhyme --feedback
+uv run cli.py samples/poetry/rhymes/invalid_rhyme.txt --verifier=rhyme --feedback
 
 # tanka
 uv run cli.py samples/poetry/tankas/good_tanka.txt --verifier=tanka --feedback
