@@ -1,6 +1,6 @@
 
 # haiku
-uv run cli.py samples/poetry/haikus/good_haiku.txt --verifier=haiku --feedback
+uv run cli.py samples/poetry/haikus/valid_haiku.txt --verifier=haiku --feedback
 uv run cli.py samples/poetry/haikus/invalid_haiku.txt --verifier=haiku --feedback
 uv run cli.py samples/poetry/haikus/granite_haiku.txt --verifier=haiku --feedback
 uv run cli.py samples/poetry/haikus/phi4_haiku_.txt --verifier=haiku --feedback

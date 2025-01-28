@@ -95,10 +95,16 @@ Then vanishes soon
     assert 0.0 <= score <= 1.0
 
     # We expect exactly 3 feedback messages (one per line)
-    assert len(feedback_list) == 3, "We expect feedback for each line"
+    assert len(feedback_list) == 3, "We expect feedback for each of the 3 lines"
 
-    # Example: check that line 2 feedback is present
-    assert any("Line 2:" in msg for msg in feedback_list), "Expected feedback for line 2"
+    # Check that each feedback line includes the new details:
+    for i, feedback_msg in enumerate(feedback_list, start=1):
+        assert f"Line {i} (" in feedback_msg,       f"Expected to see line number {i} in the feedback."
+        assert "Words:" in feedback_msg,           f"Expected 'Words:' section in line {i} feedback."
+        assert "Syllables per word:" in feedback_msg, \
+            f"Expected 'Syllables per word:' section in line {i} feedback."
+        assert "Syllable breakdown:" in feedback_msg, \
+            f"Expected 'Syllable breakdown:' section in line {i} feedback."
 
     print("Feedback test complete. Score:", score)
     print("Feedback details:")

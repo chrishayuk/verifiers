@@ -1,6 +1,6 @@
 # poetry/haiku_verifier.py
 from verifiers.base_verifier import BaseVerifier
-from verifiers.poetry.helpers.syllable_utils import count_syllables
+from verifiers.poetry.helpers.syllable_utils import count_syllables, breakdown_syllables
 
 class HaikuVerifier(BaseVerifier):
     def __init__(self):
@@ -48,7 +48,6 @@ class HaikuVerifier(BaseVerifier):
         
         # Must be exactly 3 lines for a standard haiku
         if len(lines) != 3:
-            # immediate fail => 0.0
             feedback.append(
                 f"You have {len(lines)} line(s), but a standard haiku needs exactly 3."
             )
@@ -63,24 +62,43 @@ class HaikuVerifier(BaseVerifier):
         line_feedback = []
 
         for i, line in enumerate(lines):
+            # Break out the words
+            words = line.strip().split()
+
+            # Total syllables in the entire line
             syl_count = count_syllables(line)
+
+            # Number of syllables in each individual word
+            word_syll_counts = [count_syllables(w) for w in words]
+
+            # (New) Actual syllable breakdown for each word (requires a custom function)
+            # e.g. breakdown_syllables("beautiful") -> ["beau", "ti", "ful"]
+            word_syllable_breakdowns = [
+                f"{w} ({'-'.join(breakdown_syllables(w))})" for w in words
+            ]
+
+            # Determine acceptable syllable range
             low = desired_syllables[i] - tolerance
             high = desired_syllables[i] + tolerance
 
+            # Build feedback
             if low <= syl_count <= high:
                 correct_lines += 1
                 line_feedback.append(
-                    f"Line {i+1}: Good ({syl_count} syllables)."
+                    f"Line {i+1} (\"{line}\"): Good ({syl_count} syllables).\n"
+                    f"  Words: {', '.join(words)}\n"
+                    f"  Syllables per word: {word_syll_counts}\n"
+                    f"  Syllable breakdown: {', '.join(word_syllable_breakdowns)}"
                 )
             else:
                 line_feedback.append(
-                    f"Line {i+1}: {syl_count} syllables (expected ~{desired_syllables[i]})."
+                    f"Line {i+1} (\"{line}\"): {syl_count} syllables (expected ~{desired_syllables[i]}).\n"
+                    f"  Words: {', '.join(words)}\n"
+                    f"  Syllables per word: {word_syll_counts}\n"
+                    f"  Syllable breakdown: {', '.join(word_syllable_breakdowns)}"
                 )
         
-        # Score is fraction of lines that match
         final_score = correct_lines / 3.0
-        
-        # The tests expect exactly 3 feedback messages (one per line).
         feedback.extend(line_feedback)
 
         return {
