@@ -1,3 +1,16 @@
+```bash
+uv run fastapi_server.py
+```
+
+```bash
+curl -X POST http://localhost:8000/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+        "text": "There once was a fellow named Lee\nHe was stung on the arm by a bee\nHe jumped with a start\nThen soon had a fart\nAnd happily ended up free",
+        "verifier": "limerick",
+        "feedback": true
+      }'
+```
 
 # haiku
 uv run cli.py samples/poetry/haikus/good_haiku.txt --verifier=haiku --feedback
