@@ -3,101 +3,154 @@ from verifiers.poetry.rhyme_verifier import RhymeVerifier
 
 @pytest.fixture
 def verifier():
+    """Returns an instance of RhymeVerifier."""
     return RhymeVerifier()
 
 def test_insufficient_lines(verifier):
+    """
+    If fewer than 2 lines are provided => 0.0 score,
+    and feedback should mention 'Need at least 2 lines'.
+    """
     text = "Just one line"
-    score = verifier.verify(text)
-    assert score == 0.0, "Expected 0.0 with fewer than 2 lines."
+    result = verifier.verify_with_feedback(text)
+    score = result["score"]
+    feedback = result["feedback"]
+    assert score == 0.0, f"Expected 0.0, got {score}"
+    assert any("Need at least 2 lines" in msg for msg in feedback), (
+        "Expected feedback indicating insufficient lines."
+    )
 
-def test_empty_tails(verifier):
-    # If lines are blank, we get no rhyme tail
-    text = """\
-    
+def test_perfect_rhyme(verifier):
     """
-    score = verifier.verify(text)
-    assert score == 0.0, "Expected 0.0 for empty lines."
-
-def test_full_rhyme_simple(verifier):
-    """
-    Two lines that end with words that have the same phoneme tail.
-    Example: 'bee' and 'flee' often share IY1 in the CMU dictionary.
+    Two lines that share the same final phonetic chunk => 1.0.
+    Check that feedback mentions 'Perfect rhyme'.
     """
     text = """\
-I saw a buzzing bee
-Then I found a smaller flee
+I love my cat
+He sat on the mat
 """
-    score = verifier.verify(text)
-    assert score == 1.0, f"Expected 1.0, got {score}"
+    result = verifier.verify_with_feedback(text)
+    score = result["score"]
+    feedback = result["feedback"]
+    assert score == 1.0, f"Expected perfect rhyme => 1.0, got {score}"
+    assert any("Perfect rhyme" in msg for msg in feedback), (
+        "Expected feedback mentioning 'Perfect rhyme'."
+    )
 
-def test_full_rhyme_flyer_choir(verifier):
+def test_partial_rhyme(verifier):
     """
-    'flyer' vs 'choir' often share the tail AY1-ER0, 
-    making them a perfect rhyme by last-stressed-vowel logic.
+    Overlap ratio meets threshold => partial credit.
+    We want to ensure it's neither 0.0 nor 1.0, but somewhere in between.
     """
     text = """\
-I saw a buzzing flyer
-Then I found a wandering choir
+My voice was bold
+Your choice was held
 """
-    score = verifier.verify(text)
-    assert score == 1.0, f"Expected 1.0 but got {score}"
-
-def test_full_rhyme_time_climb(verifier):
-    """
-    'time' vs 'climb' both have AY1-M from the last stressed vowel to the end,
-    which the CMU dictionary often considers a full rhyme.
-    """
-    text = """\
-Time
-Climb
-"""
-    score = verifier.verify(text)
-    assert score == 1.0, f"Expected 1.0, got {score}"
-
-def test_custom_threshold(verifier):
-    """
-    If you ever introduce a partial-overlap approach in the future, 
-    you can test how adjusting thresholds affects the result. 
-    For now, we just ensure the code doesn't error out 
-    when passing a custom threshold.
-    """
-    text = """\
-Tame
-Lame
-"""
-    # By standard logic, both lines share AY1-M => likely a full rhyme => 1.0
-    score_strict = verifier.verify(text, partial_threshold=0.8)
-    score_loose  = verifier.verify(text, partial_threshold=0.6)
-    
-    # We'll just confirm no errors and the score is within [0,1].
-    assert 0.0 <= score_strict <= 1.0
-    assert 0.0 <= score_loose <= 1.0
-
-# --- New test for verify_with_feedback --- #
-def test_feedback(verifier):
-    """
-    Test the extended feedback mechanism with a partial or fallback scenario.
-    E.g., 'Hello' / 'Gallo' might share last letters ('o'), 
-    but not necessarily a phoneme tail, giving partial fallback_credit=0.5.
-    """
-    text = """\
-Hello
-Gallo
-"""
-    # Suppose partial_threshold=0.8 => overlap ratio is likely <0.8 => fallback letter
-    result = verifier.verify_with_feedback(text, partial_threshold=0.8, fallback_credit=0.5)
+    result = verifier.verify_with_feedback(text)
     score = result["score"]
     feedback = result["feedback"]
 
-    # Expect partial credit of 0.5 (last-letter fallback), or 0.0 if the overlap logic differs
-    # We'll allow any score in [0,1], but typically you'd check specific partial values:
-    assert 0.0 <= score <= 1.0, f"Score out of range: {score}"
+    # By default partial_threshold=0.5
+    # Overlap ratio should be >=0.5 but <1.0 => partial credit.
+    # We'll just assert 0.0 < score < 1.0.
+    assert 0.0 < score < 1.0, f"Expected partial rhyme credit, got {score}"
+    # Check overlap ratio is mentioned
+    assert any("Overlap ratio:" in msg for msg in feedback), (
+        "Expected feedback with 'Overlap ratio: ...'"
+    )
+    # Check that partial overlap mention is there
+    assert any("partial rhyme credit" in msg for msg in feedback), (
+        "Expected 'partial rhyme credit' in feedback"
+    )
 
-    # feedback is a list describing how the rhyme check went
-    assert isinstance(feedback, list), "Expected feedback to be a list of messages"
-    assert len(feedback) > 0, "Expected at least one feedback message"
+def test_last_letter_fallback(verifier):
+    """
+    If phonetic overlap fails but last letters match, fallback_credit is awarded.
+    Check that the feedback references 'Last letters match'.
+    """
+    text = """\
+I love my orange bap
+He leaps around with a cup
+"""
+    result = verifier.verify_with_feedback(text)
+    score = result["score"]
+    feedback = result["feedback"]
 
-    print("Rhyme feedback test complete.\nScore:", score)
-    print("Feedback detail:")
-    for msg in feedback:
-        print(" -", msg)
+    # Expect insufficient phonetic overlap => fallback => default 0.5
+    assert score == 0.5, f"Expected fallback credit=0.5, got {score}"
+    assert any("Last letters match" in msg for msg in feedback), (
+        "Expected feedback referencing last-letter fallback."
+    )
+
+
+def test_no_rhyme(verifier):
+    """
+    If there's no phonetic overlap and no last-letter match => 0.0.
+    """
+    text = """\
+Hello
+World
+"""
+    result = verifier.verify_with_feedback(text)
+    score = result["score"]
+    feedback = result["feedback"]
+    assert score == 0.0, f"Expected 0.0, got {score}"
+    assert any("No letter match" in msg for msg in feedback), (
+        "Expected 'No letter match' fallback in feedback, got something else."
+    )
+
+def test_custom_threshold_and_credit(verifier):
+    """
+    Using partial_threshold=0.8, fallback_credit=0.2.
+    We want an overlap <0.8 so we end up with fallback=0.2.
+    """
+    text = """\
+I poured some fresh milk
+He prayed like a monk
+"""
+    result = verifier.verify_with_feedback(
+        text,
+        partial_threshold=0.8,
+        fallback_credit=0.2
+    )
+    score = result["score"]
+    feedback = result["feedback"]
+
+    # Expect overlap ratio <0.8 => fallback => 0.2
+    assert score == 0.2, f"Expected fallback credit=0.2, got {score}"
+
+    # Confirm we see threshold mention
+    assert any("(threshold=0.8)" in msg for msg in feedback), (
+        "Expected mention of the custom threshold=0.8."
+    )
+    # Confirm fallback mention
+    assert any("Last letters match" in msg for msg in feedback), (
+        "Expected a fallback mention for the last-letter match."
+    )
+
+
+def test_line_breakdown_in_feedback(verifier):
+    """
+    Verify that the updated RhymeVerifier provides per-line breakdown info
+    (words, syllables, breakdown) in the feedback.
+    """
+    text = """\
+Silly goose
+Thrilling noose
+"""
+    result = verifier.verify_with_feedback(text)
+    score = result["score"]
+    feedback = result["feedback"]
+
+    # The first two feedback entries should reference "Line 1 (..)" and "Line 2 (..)"
+    # with words, syllables, etc.
+    assert any("Line 1 (" in msg for msg in feedback), "Expected line 1 breakdown in feedback."
+    assert any("Line 2 (" in msg for msg in feedback), "Expected line 2 breakdown in feedback."
+    assert any("Words:" in msg for msg in feedback), "Expected 'Words:' in feedback."
+    assert any("Syllables per word:" in msg for msg in feedback), "Expected 'Syllables per word:' in feedback."
+    assert any("Syllable breakdown:" in msg for msg in feedback), "Expected 'Syllable breakdown:' in feedback."
+
+    # Print for debug
+    print("Score:", score)
+    for fmsg in feedback:
+        print("-", fmsg)
