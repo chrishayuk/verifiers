@@ -11,6 +11,9 @@ curl -X POST http://localhost:8000/verify \
         "feedback": true
       }'
 ```
+# reasoning
+uv run cli.py samples/reasoning/reasoning_format/valid_reasoning_format.txt --verifier=reasoning_format --feedback
+uv run cli.py samples/reasoning/reasoning_format/invalid_reasoning_format.txt --verifier=reasoning_format --feedback
 
 # haiku
 uv run cli.py samples/poetry/haikus/valid_haiku.txt --verifier=haiku --feedback

@@ -68,5 +68,11 @@
         "help": "Allowed ± deviation from each line's syllable target"
       }
     ]
-  }
+  },
+    "reasoning_format": {
+        "module": "verifiers.reasoning.reasoning_format_verifier",
+        "class": "ReasoningFormatVerifier",
+        "description": "Checks if text follows the <think> and <answer> tag structure.",
+        "arguments": []
+    }
   }
