@@ -11,6 +11,18 @@ curl -X POST http://localhost:8000/verify \
         "feedback": true
       }'
 ```
+
+```bash
+curl -X POST http://localhost:8000/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+        "text": "<think>The sum of 3 and 4 is calculated by adding the two numbers together. 3 + 4 equals 7.</think><answer>7</answer>",
+        "verifier": "reasoning_format",
+        "feedback": true
+      }'
+```
+
+
 # reasoning
 uv run cli.py samples/reasoning/reasoning_format/valid_reasoning_format.txt --verifier=reasoning_format --feedback
 uv run cli.py samples/reasoning/reasoning_format/invalid_reasoning_format.txt --verifier=reasoning_format --feedback
