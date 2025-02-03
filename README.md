@@ -35,9 +35,33 @@ curl -X POST http://localhost:8000/verify \
   }'
 ```
 
+```bash
+curl -X POST http://localhost:8000/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Here is my final solution: <verifier_answer>4</verifier_answer>",
+    "verifier": "verifier_answer",
+    "feedback": true,
+    "args": {
+      "gold_solution": "4"
+    }
+  }'
+```
+
 # math
 uv run cli.py samples/math/valid_boxed_answer.txt --verifier=boxed_answer --feedback --gold_solution="\(\boxed{4}\)"
 uv run cli.py samples/math/invalid_boxed_answer.txt --verifier=boxed_answer --feedback --gold_solution="\(\boxed{4}\)"
+
+uv run cli.py samples/reasoning/verifier_answer/valid_verifier_answer.txt \
+  --verifier=verifier_answer \
+  --feedback \
+  --gold_solution="4"
+
+uv run cli.py samples/reasoning/verifier_answer/invalid_verifier_answer.txt \
+  --verifier=verifier_answer \
+  --feedback \
+  --gold_solution="4"
+
 
 # reasoning
 uv run cli.py samples/reasoning/reasoning_format/valid_reasoning_format.txt --verifier=reasoning_format --feedback
