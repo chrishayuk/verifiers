@@ -3,10 +3,25 @@ import re
 from verifiers.base_verifier import BaseVerifier
 
 class ReasoningFormatVerifier(BaseVerifier):
+    """
+    Strict format verifier requiring:
+      1) The entire text must be <think>...</think><answer>...</answer><verifier_answer>...</verifier_answer>
+      2) All three tags must be non-empty
+      => Returns 1.0 if strictly matched, else 0.0
+    """
+
+    STRICT_PATTERN = re.compile(
+        r"^\s*<think>(.*?)</think>\s*<answer>(.*?)</answer>\s*<verifier_answer>(.*?)</verifier_answer>\s*$",
+        re.DOTALL
+    )
+
     def __init__(self):
         super().__init__(
-            name="reasoning_format_tag_verifier",
-            description="Checks if the text follows the required reasoning format with <think> and <answer> tags.",
+            name="strict_full_format_verifier",
+            description=(
+                "Strictly checks <think>...</think><answer>...</answer><verifier_answer>...</verifier_answer> "
+                "with no partial credit."
+            ),
             parameters={}
         )
 
@@ -15,39 +30,20 @@ class ReasoningFormatVerifier(BaseVerifier):
         return result["score"]
 
     def verify_with_feedback(self, text: str, **kwargs) -> dict:
-        """
-        Returns a dict with:
-          {
-            "score": float in [0.0, 1.0],
-            "feedback": list of strings
-          }
-
-        This verifier ensures that the text adheres to a strict format by checking:
-          - The text starts with <think> and ends with </answer>.
-          - It contains a properly closed <think> tag followed by an <answer> tag.
-          - The reasoning content is non-empty.
-          - The answer content is non-empty.
-        """
         feedback = []
-        pattern = r"^\s*<think>(.*?)</think>\s*<answer>(.*?)</answer>\s*$"
-        match = re.match(pattern, text, re.DOTALL)  # Case-sensitive match
+        match = self.STRICT_PATTERN.match(text)
 
-        if not match:
+        if match:
+            think_content, answer_content, verifier_answer_content = match.groups()
+            # Check all are non-empty after trimming whitespace
+            if think_content.strip() and answer_content.strip() and verifier_answer_content.strip():
+                feedback.append("Strict match for <think>, <answer>, <verifier_answer> => score=1.0.")
+                return {"score": 1.0, "feedback": feedback}
+            else:
+                feedback.append("One or more tags are empty => score=0.0.")
+                return {"score": 0.0, "feedback": feedback}
+        else:
             feedback.append(
-                "Text does not conform to the required format. Ensure it follows: "
-                "<think>reasoning...</think><answer>final answer...</answer>."
+                "Does not strictly match <think>...</think><answer>...</answer><verifier_answer>...</verifier_answer> => score=0.0."
             )
             return {"score": 0.0, "feedback": feedback}
-
-        think_content, answer_content = match.groups()
-
-        if not think_content.strip():
-            feedback.append("The <think> section is empty. It must contain reasoning steps.")
-            return {"score": 0.0, "feedback": feedback}
-
-        if not answer_content.strip():
-            feedback.append("The <answer> section is empty. It must contain a final answer.")
-            return {"score": 0.0, "feedback": feedback}
-
-        feedback.append("✅ Text correctly includes both <think> and <answer> tags with valid content.")
-        return {"score": 1.0, "feedback": feedback}
