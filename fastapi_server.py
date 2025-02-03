@@ -2,20 +2,20 @@
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List, Union
+from typing import List, Union, Dict, Any
 
 # Import your existing logic
 from registry_loader import load_registry, load_verifier_class
 
 app = FastAPI()
 
-# Define a request model
+# Updated request model
 class VerifyRequest(BaseModel):
-    text: str         # The text to analyse (e.g. poem)
-    verifier: str     # Which verifier to use, e.g. "limerick"
+    text: str
+    verifier: str
     feedback: bool = False
+    args: Dict[str, Any] = {}
 
-# Define a response model
 class VerifyResponse(BaseModel):
     score: float
     feedback: Union[List[str], None] = None
@@ -24,12 +24,14 @@ class VerifyResponse(BaseModel):
 def verify(req: VerifyRequest):
     """
     POST a JSON payload like:
-      {
-        "text": "There once was a man from Peru...",
-        "verifier": "limerick",
-        "feedback": true
+    {
+      "text": "\\(\\boxed{4}\\)",
+      "verifier": "boxed_answer",
+      "feedback": true,
+      "args": {
+        "gold_solution": "\\(\\boxed{4}\\)"
       }
-    Returns JSON with "score" and, if requested, "feedback".
+    }
     """
 
     # 1) Load the registry
@@ -38,7 +40,7 @@ def verify(req: VerifyRequest):
     # 2) Check if requested verifier is known
     if req.verifier not in registry_data:
         return {
-            "score": 0.0, 
+            "score": 0.0,
             "feedback": [f"Unknown verifier: {req.verifier}"]
         }
 
@@ -46,20 +48,44 @@ def verify(req: VerifyRequest):
     verifier_cls = load_verifier_class(req.verifier, registry_data)
     verifier_obj = verifier_cls()
 
-    # 4) If your verifiers support additional dynamic args, parse them here:
-    #    For example, if your JSON or registry has lines like:
-    #       "arguments": [{"name": "--tolerance", "default": 0.5}, ...]
-    #    You can re-use the same logic as in your CLI code to build a dict
-    #    of arguments and pass them to verifier_obj.verify(...).
-    
+    # 4) Collect & cast dynamic arguments from registry defaults + request args
+    #    (only if the registry defines "arguments" for this verifier)
+    dynamic_args = {}
+    verifier_info = registry_data[req.verifier]
+    registry_args = verifier_info.get("arguments", [])  # list of { name, type, default, help, ... }
+    user_args = req.args or {}
+
+    for arg_def in registry_args:
+        # Trim leading '--'
+        arg_name = arg_def["name"].lstrip("--")
+        arg_type = arg_def["type"]
+        default_val = arg_def.get("default", None)
+
+        # If user provided the arg, use that; otherwise fallback to default
+        val = user_args.get(arg_name, default_val)
+
+        # Cast to the correct type
+        if val is not None:
+            if arg_type == "int":
+                val = int(val)
+            elif arg_type == "float":
+                val = float(val)
+            elif arg_type == "str":
+                val = str(val)
+            # add other cases if needed (bool, etc.)
+
+        dynamic_args[arg_name] = val
+
+    # 5) Call the verifier with optional arguments
     if req.feedback:
-        result = verifier_obj.verify_with_feedback(req.text)
+        # Pass `req.text` plus any dynamic arguments
+        result = verifier_obj.verify_with_feedback(req.text, **dynamic_args)
         return {
             "score": result["score"],
             "feedback": result["feedback"]
         }
     else:
-        score = verifier_obj.verify(req.text)
+        score = verifier_obj.verify(req.text, **dynamic_args)
         return {
             "score": score,
             "feedback": None

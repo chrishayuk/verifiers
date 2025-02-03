@@ -1,62 +1,62 @@
 {
-    "haiku": {
-      "module": "verifiers.poetry.haiku_verifier",
-      "class": "HaikuVerifier",
-      "description": "Checks if text is ~5-7-5 haiku (with partial-credit).",
-      "arguments": [
-        {
-          "name": "--tolerance",
-          "type": "int",
-          "default": 1,
-          "help": "Allowed +/- deviation from 5 or 7 (Haiku lines)."
-        }
-      ]
-    },
-    "limerick": {
-      "module": "verifiers.poetry.limerick_verifier",
-      "class": "LimerickVerifier",
-      "description": "Checks if text is a limerick with partial credit for line count, rhyme, etc.",
-      "arguments": [
-        {
-          "name": "--line_count_required",
-          "type": "int",
-          "default": 5,
-          "help": "Number of lines required (default 5)."
-        },
-        {
-          "name": "--long_min",
-          "type": "int",
-          "default": 7,
-          "help": "Min syllables for lines 1,2,5."
-        },
-        {
-          "name": "--long_max",
-          "type": "int",
-          "default": 11,
-          "help": "Max syllables for lines 1,2,5."
-        }
-      ]
-    },
-    "rhyme": {
-      "module": "verifiers.poetry.rhyme_verifier",
-      "class": "RhymeVerifier",
-      "description": "Checks if lines 1 and 2 rhyme (partial overlap or fallback).",
-      "arguments": [
-        {
-          "name": "--partial_threshold",
-          "type": "float",
-          "default": 0.5,
-          "help": "Minimum fraction of overlapping phonemes required at the tail."
-        },
-        {
-          "name": "--fallback_credit",
-          "type": "float",
-          "default": 0.5,
-          "help": "Score assigned if last letters match but phoneme overlap fails."
-        }
-      ]
-    },
-    "tanka": {
+  "haiku": {
+    "module": "verifiers.poetry.haiku_verifier",
+    "class": "HaikuVerifier",
+    "description": "Checks if text is ~5-7-5 haiku (with partial-credit).",
+    "arguments": [
+      {
+        "name": "--tolerance",
+        "type": "int",
+        "default": 1,
+        "help": "Allowed +/- deviation from 5 or 7 (Haiku lines)."
+      }
+    ]
+  },
+  "limerick": {
+    "module": "verifiers.poetry.limerick_verifier",
+    "class": "LimerickVerifier",
+    "description": "Checks if text is a limerick with partial credit for line count, rhyme, etc.",
+    "arguments": [
+      {
+        "name": "--line_count_required",
+        "type": "int",
+        "default": 5,
+        "help": "Number of lines required (default 5)."
+      },
+      {
+        "name": "--long_min",
+        "type": "int",
+        "default": 7,
+        "help": "Min syllables for lines 1,2,5."
+      },
+      {
+        "name": "--long_max",
+        "type": "int",
+        "default": 11,
+        "help": "Max syllables for lines 1,2,5."
+      }
+    ]
+  },
+  "rhyme": {
+    "module": "verifiers.poetry.rhyme_verifier",
+    "class": "RhymeVerifier",
+    "description": "Checks if lines 1 and 2 rhyme (partial overlap or fallback).",
+    "arguments": [
+      {
+        "name": "--partial_threshold",
+        "type": "float",
+        "default": 0.5,
+        "help": "Minimum fraction of overlapping phonemes required at the tail."
+      },
+      {
+        "name": "--fallback_credit",
+        "type": "float",
+        "default": 0.5,
+        "help": "Score assigned if last letters match but phoneme overlap fails."
+      }
+    ]
+  },
+  "tanka": {
     "module": "verifiers.poetry.tanka_verifier",
     "class": "TankaVerifier",
     "description": "Checks if text is a 5-line tanka with ~5-7-5-7-7 syllables",
@@ -69,10 +69,23 @@
       }
     ]
   },
-    "reasoning_format": {
-        "module": "verifiers.reasoning.reasoning_format_verifier",
-        "class": "ReasoningFormatVerifier",
-        "description": "Checks if text follows the <think> and <answer> tag structure.",
-        "arguments": []
-    }
+  "reasoning_format": {
+    "module": "verifiers.reasoning.reasoning_format_verifier",
+    "class": "ReasoningFormatVerifier",
+    "description": "Checks if text follows the <think> and <answer> tag structure.",
+    "arguments": []
+  },
+  "boxed_answer": {
+    "module": "verifiers.math.boxed_answer_verifier",
+    "class": "BoxedAnswerVerifier",
+    "description": "Enforces that the final answer is in a LaTeX box and matches the gold solution.",
+    "arguments": [
+      {
+        "name": "--gold_solution",
+        "type": "str",
+        "default": null,
+        "help": "The correct LaTeX box expression for comparison."
+      }
+    ]
   }
+}

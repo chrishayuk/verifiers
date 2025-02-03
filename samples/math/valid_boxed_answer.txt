@@ -1,0 +1,2 @@
+Solve the problem: 2 + 2
+The final answer is: \(\boxed{4}\)
