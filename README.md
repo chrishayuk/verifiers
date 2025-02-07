@@ -6,6 +6,35 @@ uv run fastapi_server.py
 curl -X POST http://localhost:8000/verify \
   -H "Content-Type: application/json" \
   -d '{
+    "verifier": "morse_code",
+    "feedback": true,
+    "args": {
+      "original_text": "HELLO WORLD",
+      "verify_mode": "encode"
+    },
+    "text": ".... . .-.. .-.. --- / .-- --- .-. .-.. -.."
+  }'
+```
+
+```bash
+curl -X POST http://localhost:8000/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+        "verifier": "morse_code",
+        "feedback": true,
+        "args": {
+          "original_text": ".... . .-.. .-.. --- / .-- --- .-. .-.. -..",
+          "verify_mode": "decode"
+        },
+        "text": "HELLO WORLD"
+      }'
+```
+
+
+```bash
+curl -X POST http://localhost:8000/verify \
+  -H "Content-Type: application/json" \
+  -d '{
         "text": "There once was a fellow named Lee\nHe was stung on the arm by a bee\nHe jumped with a start\nThen soon had a fart\nAnd happily ended up free",
         "verifier": "limerick",
         "feedback": true

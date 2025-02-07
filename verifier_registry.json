@@ -75,6 +75,12 @@
     "description": "Checks if text follows the <think> and <answer> tag structure.",
     "arguments": []
   },
+  "reasoning_format_with_verifier_answer": {
+    "module": "verifiers.reasoning.reasoning_format_with_verifier_answer_verifier",
+    "class": "ReasoningFormatWithVerifierAnswerVerifier",
+    "description": "Checks if text follows the <think> and <answer> tag structure.",
+    "arguments": []
+  },
   "boxed_answer": {
     "module": "verifiers.math.boxed_answer_verifier",
     "class": "BoxedAnswerVerifier",
@@ -89,16 +95,54 @@
     ]
   },
   "verifier_answer": {
-  "module": "verifiers.reasoning.verifier_answer_verifier",
-  "class": "VerifierAnswerVerifier",
-  "description": "Requires the final answer to appear within <verifier_answer>...</verifier_answer> tags and match a simple gold answer string.",
-  "arguments": [
-    {
-      "name": "--gold_solution",
-      "type": "str",
-      "default": null,
-      "help": "Plain-text correct answer for direct comparison."
-    }
-  ]
-}
+    "module": "verifiers.reasoning.verifier_answer_verifier",
+    "class": "VerifierAnswerVerifier",
+    "description": "Requires the final answer to appear within <verifier_answer>...</verifier_answer> tags and match a simple gold answer string.",
+    "arguments": [
+      {
+        "name": "--gold_solution",
+        "type": "str",
+        "default": null,
+        "help": "Plain-text correct answer for direct comparison."
+      }
+    ]
+  },
+  "morse_code": {
+    "module": "verifiers.language.morse_code.morse_code_verifier",
+    "class": "MorseCodeVerifier",
+    "description": "Checks if text matches Morse encoding or decoding of the original_text.",
+    "arguments": [
+      {
+        "name": "--original_text",
+        "type": "str",
+        "default": "",
+        "help": "Reference text (in plain text for encode mode, or Morse code for decode mode)."
+      },
+      {
+        "name": "--verify_mode",
+        "type": "str",
+        "default": "encode",
+        "help": "Either 'encode' (candidate is Morse) or 'decode' (candidate is plain text)."
+      }
+    ]
+  },
+  "answer_satisfaction": {
+    "module": "verifiers.reasoning.answer_satisfaction_verifier",
+    "class": "AnswerSatisfactionVerifier",
+    "description": "Scores how 'satisfying' the <answer> is for a given question, factoring correctness with a gold_answer. Calls LLM to produce a 0..1 score.",
+    "arguments": [
+      {
+        "name": "--question",
+        "type": "str",
+        "default": null,
+        "help": "The original question to pass to the LLM."
+      },
+      {
+        "name": "--gold_answer",
+        "type": "str",
+        "default": null,
+        "help": "The correct or reference answer for scoring correctness."
+      }
+    ]
+  }
 }
