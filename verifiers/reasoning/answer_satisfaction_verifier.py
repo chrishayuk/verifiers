@@ -31,7 +31,7 @@ class AnswerSatisfactionVerifier(BaseVerifier):
 
     ANSWER_PATTERN = re.compile(r"<answer>(.*?)</answer>", re.DOTALL | re.IGNORECASE)
 
-    def __init__(self, name="satisfaction_verifier", default_model="llama3.1"):
+    def __init__(self, name="satisfaction_verifier", default_model="granite3.1-dense"):
         super().__init__(
             name=name,
             description=(
