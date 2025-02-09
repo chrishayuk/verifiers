@@ -3,6 +3,20 @@ uv run fastapi_server.py
 ```
 
 ```bash
+curl -X POST https://verifiers-weathered-glitter-8347.fly.dev/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "verifier": "morse_code",
+    "feedback": true,
+    "args": {
+      "original_text": "HELLO WORLD",
+      "verify_mode": "encode"
+    },
+    "text": ".... . .-.. .-.. --- / .-- --- .-. .-.. -.."
+  }'
+```
+
+```bash
 curl -X POST http://localhost:8000/verify \
   -H "Content-Type: application/json" \
   -d '{

@@ -1241,7 +1241,7 @@ requires-dist = [
     { name = "datasets", specifier = ">=3.2.0" },
     { name = "fastapi", specifier = ">=0.115.8" },
     { name = "jinja2", specifier = ">=3.1.5" },
-    { name = "mlx-lm", specifier = ">=0.21.1" },
+    { name = "mlx-lm" },
     { name = "ollama", specifier = ">=0.4.7" },
     { name = "pronouncing", specifier = ">=0.2.0" },
     { name = "pytest", specifier = ">=8.3.4" },

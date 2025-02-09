@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+pronouncing
+jinja2
+datasets
